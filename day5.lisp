@@ -40,18 +40,10 @@
   for print in (getf data :prints)
   when (valid-p print rules) sum (middle-num print))
 
-;; part 2 - pretty sure its linear time in # of prints and length of each print
-(defun sorted (print rules)
-  (loop
-    with result = (make-array (list (length print)))
-    for n in print
-    for afters = (intersection print (gethash n rules))
-    for idx = (1- (- (length print) (length afters)))
-    do (setf (aref result idx) n)
-    finally (return (coerce result 'list))))	 
+;; part 2
 (loop
   with data = (parse (uiop:read-file-string "day5.input"))
   with rules = (getf data :rules)
   for print in (getf data :prints)
   when (not (valid-p print rules))
-  sum (middle-num (sorted print rules)))
+  sum (middle-num (sort print (^ (a b) (member b (gethash a rules) :test 'equal)))))
