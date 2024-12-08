@@ -48,33 +48,23 @@
   :test 'equal))
 
 ;; part 2
-(defun add (p1 p2)
-  (destructuring-bind ((x1 y1) (x2 y2)) (list p1 p2)
-    `(,(+ x1 x2) ,(+ y1 y2))))
-(defun sub (p1 p2)
-  (destructuring-bind ((x1 y1) (x2 y2)) (list p1 p2)
-    `(,(- x2 x1) ,(- y2 y1))))
 (defun antinode-2 (ps w h)
   (destructuring-bind (p1 p2) ps
-    (remove-duplicates
      (nconc
       (list p1 p2)
-      (loop with dp = (sub p1 p2)
+      (loop with dp = (mapcar '- p1 p2)
 	    repeat 100
-	    for p = (add p1 dp) then (add p dp)
+	    for p = (mapcar '+ p1 dp) then (mapcar '+ p dp)
 	    when (inside-p p 0 0 w h) collect p)
-      (loop with dp = (sub p2 p1)
+      (loop with dp = (mapcar '- p2 p1)
 	    repeat 100
-	    for p = (add p1 dp) then (add p dp)
-	    when (inside-p p 0 0 w h) collect p))
-     :test 'equal)))
+	    for p = (mapcar '+ p1 dp) then (mapcar '+ p dp)
+	    when (inside-p p 0 0 w h) collect p))))
 (length
  (remove-duplicates
-  (remove-if
-   (^ (p) (not (inside-p p 0 0 49 49)))
    (loop
      with table = (parse (uiop:read-file-lines "day8.input"))
      with freqs = (collect-freqs table)
      for freq being the hash-key using (hash-value coords) of freqs
-     nconc (mapcan (^ (ps) (antinode-2 ps 49 49)) (pairs coords))))
+     nconc (mapcan (^ (ps) (antinode-2 ps 49 49)) (pairs coords)))
   :test 'equal))
